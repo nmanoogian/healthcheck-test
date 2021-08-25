@@ -1,5 +1,6 @@
 const axios = require("axios");
 
+const version = process.env.VERSION;
 const slackURL = process.env.SLACK_URL;
 
 async function do_check(url) {
@@ -37,7 +38,7 @@ async function slack(message) {
 }
 
 async function main() {
-  await slack("polling started");
+  await slack(`polling started ${version}`);
   while (true) {
     await do_check("https://api.doppler.com/_/health/router");
     await delay(1000);
