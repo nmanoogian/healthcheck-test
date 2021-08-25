@@ -56,6 +56,7 @@ async function slack(message) {
 }
 
 async function main() {
+  console.log("starting");
   await slack(`polling started ${version}`);
 
   const dnsPolling = new DnsPolling({
