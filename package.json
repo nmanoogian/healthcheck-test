@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1"
+    "@shuhei/pollen": "0.0.5",
+    "axios": "^0.21.1",
+    "undici": "^4.4.7"
   }
 }

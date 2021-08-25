@@ -1,7 +1,10 @@
 const axios = require("axios");
+const { DnsPolling, HttpsAgent } = require("@shuhei/pollen");
+const { request } = require('undici');
 
 const version = "VERSION_PLACEHOLDER";
 const slackURL = process.env.SLACK_URL;
+const verbose = process.env.LOGGING === "debug";
 
 async function do_check(url) {
   return axios
@@ -13,11 +16,26 @@ async function do_check(url) {
       timeout: 10000,
     })
     .then(() => {
-      console.log(new Date(), `${url} OK`)
+      if (verbose) {
+        console.log(new Date(), `${url} axios OK`)
+      }
     })
     .catch(error => {
       console.error(error)
-      slack(`Healthcheck error ${url}: ${error}`)
+      slack(`Healthcheck axios error ${url}: ${error}`)
+    });
+}
+
+async function do_undici(url) {
+  request(url)
+    .then(() => {
+      if (verbose) {
+        console.log(new Date(), `${url} undici OK`)
+      }
+    })
+    .catch(error => {
+      console.error(error)
+      slack(`Healthcheck undici error ${url}: ${error}`)
     });
 }
 
@@ -39,12 +57,30 @@ async function slack(message) {
 
 async function main() {
   await slack(`polling started ${version}`);
+
+  const dnsPolling = new DnsPolling({
+    interval: 1 * 1000
+  });
+
+  if (verbose) {
+    dnsPolling.on("resolve:success", info => {
+      console.log("DNS success", info);
+    });
+  }
+  dnsPolling.on("resolve:error", info => {
+    console.log("DNS error", info);
+  });
+
+  dnsPolling.getLookup("staging-api.doppler.com")
+
   while (true) {
-    await do_check("https://api.doppler.com/_/health/router");
-    await delay(1000);
-    await do_check("https://api.doppler.com");
+    await Promise.all([
+      do_check("https://staging-api.doppler.com/_/health/router"),
+      do_check("https://staging-api.doppler.com"),
+      do_undici("https://staging-api.doppler.com/_/health/router"),
+      do_undici("https://staging-api.doppler.com"),
+    ]);
     await delay(1000);
   }
 }
-
 main().catch(e => console.error(e))
