@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const version = process.env.VERSION;
+const version = "VERSION_PLACEHOLDER";
 const slackURL = process.env.SLACK_URL;
 
 async function do_check(url) {
