@@ -21,7 +21,7 @@ async function do_check(url) {
       }
     })
     .catch(error => {
-      console.error(error)
+      console.error("axios error", error)
       slack(`Healthcheck axios error ${url}: ${error}`)
     });
 }
@@ -34,7 +34,7 @@ async function do_undici(url) {
       }
     })
     .catch(error => {
-      console.error(error)
+      console.error("undici error", error)
       slack(`Healthcheck undici error ${url}: ${error}`)
     });
 }
