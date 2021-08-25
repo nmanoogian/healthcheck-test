@@ -2,9 +2,9 @@ const axios = require("axios");
 
 const slackURL = process.env.SLACK_URL;
 
-async function do_check(i) {
+async function do_check(url) {
   return axios
-    .request("https://api.doppler.com/_/health/router", {
+    .request(url, {
       headers: {
         "User-Agent": "Doppler Bot",
         "Accept": "application/json, text/plain, */*",
@@ -12,11 +12,11 @@ async function do_check(i) {
       timeout: 10000,
     })
     .then(() => {
-      console.log(new Date(), `(${i}) OK`)
+      console.log(new Date(), `${url} OK`)
     })
     .catch(error => {
-      console.error(i, error)
-      slack(`Healthcheck error: ${error}`)
+      console.error(error)
+      slack(`Healthcheck error ${url}: ${error}`)
     });
 }
 
@@ -39,7 +39,9 @@ async function slack(message) {
 async function main() {
   await slack("polling started");
   while (true) {
-    await do_check(0);
+    await do_check("https://api.doppler.com/_/health/router");
+    await delay(1000);
+    await do_check("https://api.doppler.com");
     await delay(1000);
   }
 }
