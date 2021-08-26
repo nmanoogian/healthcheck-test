@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 VERSION=$(git describe --always)
 sed -i "" "s/VERSION_PLACEHOLDER/$VERSION/g" check.js
 docker build . -t healthcheck-test
