@@ -11,6 +11,7 @@
   "dependencies": {
     "@shuhei/pollen": "0.0.5",
     "axios": "^0.21.1",
+    "serialize-error": "^8.1.0",
     "undici": "^4.4.7"
   }
 }

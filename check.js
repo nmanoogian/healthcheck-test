@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { DnsPolling, HttpsAgent } = require("@shuhei/pollen");
 const { request } = require('undici');
+const { serializeError } = require('serialize-error');
 
 const version = "VERSION_PLACEHOLDER";
 const slackURL = process.env.SLACK_URL;
@@ -21,7 +22,7 @@ async function do_check(url) {
       }
     })
     .catch(error => {
-      console.error("axios error", error)
+      console.error("axios error", JSON.stringify(serializeError(error)))
       slack(`Healthcheck axios error ${url}: ${error}`)
     });
 }
@@ -34,7 +35,7 @@ async function do_undici(url) {
       }
     })
     .catch(error => {
-      console.error("undici error", error)
+      console.error("undici error", JSON.stringify(serializeError(error)))
       slack(`Healthcheck undici error ${url}: ${error}`)
     });
 }
