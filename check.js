@@ -77,11 +77,11 @@ async function main() {
 
   while (true) {
     await Promise.all([
-      do_check("https://staging-api.doppler.com/_/health/router"),
-      do_check("https://staging-api.doppler.com"),
-      do_undici("https://staging-api.doppler.com/_/health/router"),
-      do_undici("https://staging-api.doppler.com"),
-    ]);
+      "https://cli.staging.doppler.com/install.sh",
+      "https://staging-api.doppler.com/_/health/router",
+      "https://staging-api.doppler.com",
+      ].map(url => [do_undici(url), do_check(url)]).flat()
+    );
     await delay(1000);
   }
 }
