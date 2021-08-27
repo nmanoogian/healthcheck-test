@@ -80,6 +80,7 @@ async function main() {
       "https://cli.staging.doppler.com/install.sh",
       "https://staging-api.doppler.com/_/health/router",
       "https://staging-api.doppler.com",
+      "https://google.com",
       ].map(url => [do_undici(url), do_check(url)]).flat()
     );
     await delay(1000);
