@@ -81,9 +81,15 @@ async function checkMain() {
 
   while (true) {
     await Promise.all([
+      // Production
+      "https://cli.doppler.com/install.sh",
+      "https://api.doppler.com/_/health/router",
+      "https://api.doppler.com",
+      // Staging
       "https://cli.staging.doppler.com/install.sh",
       "https://staging-api.doppler.com/_/health/router",
       "https://staging-api.doppler.com",
+      // Sanity Check
       "https://google.com",
       ].map(url => [do_undici(url), do_check(url)]).flat()
     );
