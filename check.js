@@ -1,11 +1,24 @@
 const axios = require("axios");
-const { DnsPolling, HttpsAgent } = require("@shuhei/pollen");
+const { DnsPolling } = require("@shuhei/pollen");
 const { request } = require('undici');
 const { serializeError } = require('serialize-error');
 
-const version = "VERSION_PLACEHOLDER";
 const slackURL = process.env.SLACK_URL;
 const verbose = process.env.LOGGING === "debug";
+
+let logs = [];
+
+async function log(message) {
+  logs.unshift(`${new Date().toISOString()} :: ${message}`);
+  logs = logs.slice(0, 100);
+
+  if (slackURL != null) {
+    return axios.request(slackURL, {
+      method: "post",
+      data: { text: message }
+    });
+  }
+}
 
 async function do_check(url) {
   return axios
@@ -21,9 +34,9 @@ async function do_check(url) {
         console.log(new Date(), `${url} axios OK`)
       }
     })
-    .catch(error => {
+    .catch(async (error) => {
       console.error("axios error", JSON.stringify(serializeError(error)))
-      slack(`Healthcheck axios error ${url}: ${error}`)
+      await log(`Healthcheck axios error ${url}: ${error}`)
     });
 }
 
@@ -34,9 +47,9 @@ async function do_undici(url) {
         console.log(new Date(), `${url} undici OK`)
       }
     })
-    .catch(error => {
+    .catch(async (error) => {
       console.error("undici error", JSON.stringify(serializeError(error)))
-      slack(`Healthcheck undici error ${url}: ${error}`)
+      await log(`Healthcheck undici error ${url}: ${error}`)
     });
 }
 
@@ -46,19 +59,9 @@ async function delay(ms) {
   });
 }
 
-async function slack(message) {
-  if (slackURL == null) {
-    return;
-  }
-  return axios.request(slackURL, {
-    method: "post",
-    data: { text: message }
-  });
-}
-
-async function main() {
-  console.log(`starting ${version}`);
-  await slack(`polling started ${version}`);
+async function checkMain() {
+  console.log(`starting poller`);
+  await log(`polling started`);
 
   const dnsPolling = new DnsPolling({
     interval: 1 * 1000
@@ -69,8 +72,9 @@ async function main() {
       console.log("DNS success", info);
     });
   }
-  dnsPolling.on("resolve:error", info => {
+  dnsPolling.on("resolve:error", async (info) => {
     console.log("DNS error", info);
+    await log(`DNS error: ${info}`);
   });
 
   dnsPolling.getLookup("staging-api.doppler.com")
@@ -86,4 +90,5 @@ async function main() {
     await delay(1000);
   }
 }
-main().catch(e => console.error(e))
+
+module.exports = { checkMain, logs };
