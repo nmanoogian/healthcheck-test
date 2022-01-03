@@ -2,7 +2,7 @@
   "name": "healthcheck-test",
   "version": "1.0.0",
   "description": "",
-  "main": "check.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +11,7 @@
   "dependencies": {
     "@shuhei/pollen": "0.0.5",
     "axios": "^0.21.1",
+    "express": "^4.17.2",
     "serialize-error": "^8.1.0",
     "undici": "^4.4.7"
   }
