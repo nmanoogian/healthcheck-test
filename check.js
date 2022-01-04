@@ -8,6 +8,10 @@ const verbose = process.env.LOGGING === "debug";
 
 let logs = [];
 
+function getLogs() {
+  return logs;
+}
+
 async function log(message) {
   logs.unshift(`${new Date().toISOString()} :: ${message}`);
   logs = logs.slice(0, 100);
@@ -97,4 +101,4 @@ async function checkMain() {
   }
 }
 
-module.exports = { checkMain, logs };
+module.exports = { checkMain, getLogs };
